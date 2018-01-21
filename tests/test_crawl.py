@@ -13,9 +13,25 @@ class MyTestCase(unittest.TestCase):
         }]
         crawler.insert_or_update_real_estate_item(items)
 
+        items = [{
+            'link': 'https://www.realestate.com.au/property-unit-qld-broadbeach-422974878',
+            'price_per_week': '123',
+            'time_to_work': time(0, 23, 0)
+
+        }]
+        crawler.insert_or_update_real_estate_item(items)
+
     def test_crawl_first_page(self):
-        start_page = 'https://www.realestate.com.au/rent/in-gold+coast,+qld/'
+        start_page = 'https://www.realestate.com.au/rent/in-gold+coast,+qld/list-1'
         crawler.crawl(start_page)
+
+    def test_update_all_real_estates_in_database(self):
+        crawler.update_all_real_estates_in_database()
+
+    def test_total_crawl(self):
+        start_page = 'https://www.realestate.com.au/rent/property-unit+apartment-with-1-bedroom-between-400-700-in-gold+coast%2c+qld/list-1?maxBeds=1&source=location-search'
+        crawler.crawl(start_page)
+        crawler.update_all_real_estates_in_database()
 
     def test_find_links_to_real_estates(self):
         links = crawler.find_links_to_real_estates('https://www.realestate.com.au/rent/in-gold+coast,+qld/list-1')
