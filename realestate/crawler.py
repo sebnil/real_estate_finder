@@ -28,7 +28,10 @@ def update_all_real_estates_in_database():
 
     for estate in estates:
         estate_d = shortcuts.model_to_dict(estate)
-        update_information_about_real_estate(estate_d['link'])
+        try:
+            update_information_about_real_estate(estate_d['link'])
+        except:
+            print('error updating {}'.format(estate_d['link']))
 
 def find_links_to_real_estates(link):
     found_links = []
@@ -50,6 +53,7 @@ def find_links_to_real_estates(link):
     return found_links
 
 def update_information_about_real_estate(link):
+    print('update_information_about_real_estate: {}'.format(link))
     item = {'link': link}
     driver = get_chrome_driver_without_loading_images()
 

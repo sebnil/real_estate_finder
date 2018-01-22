@@ -22,7 +22,7 @@ class MyTestCase(unittest.TestCase):
         crawler.insert_or_update_real_estate_item(items)
 
     def test_crawl_first_page(self):
-        start_page = 'https://www.realestate.com.au/rent/in-gold+coast,+qld/list-1'
+        start_page = 'https://www.realestate.com.au/rent/property-unit+apartment-with-1-bedroom-between-400-700-in-gold+coast%2c+qld/list-1?maxBeds=1&source=location-search'
         crawler.crawl(start_page)
 
     def test_update_all_real_estates_in_database(self):
