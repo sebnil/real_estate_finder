@@ -1,6 +1,7 @@
 import unittest
-from realestate import crawler
+from realestate import crawler, xlsx_generator
 from datetime import time, datetime, timedelta
+
 
 class MyTestCase(unittest.TestCase):
 
@@ -28,10 +29,14 @@ class MyTestCase(unittest.TestCase):
     def test_update_all_real_estates_in_database(self):
         crawler.update_all_real_estates_in_database()
 
+    def test_xlsx_generator_generate(self):
+        xlsx_generator.generate()
+
     def test_total_crawl(self):
-        start_page = 'https://www.realestate.com.au/rent/property-unit+apartment-with-1-bedroom-between-400-700-in-gold+coast%2c+qld/list-1?maxBeds=1&source=location-search'
+        start_page = 'https://www.realestate.com.au/rent/property-unit+apartment-with-1-bedroom-between-400-500-in-gold+coast%2c+qld/list-1?maxBeds=1&source=location-search'
         crawler.crawl(start_page)
         crawler.update_all_real_estates_in_database()
+        xlsx_generator.generate()
 
     def test_find_links_to_real_estates(self):
         links = crawler.find_links_to_real_estates('https://www.realestate.com.au/rent/in-gold+coast,+qld/list-1')
@@ -43,19 +48,32 @@ class MyTestCase(unittest.TestCase):
     def test_get_information_about_real_estate(self):
         item = crawler.update_information_about_real_estate('https://www.realestate.com.au/property-unit-qld-palm+beach-422972482')
         print(item)
-        self.assertIsNotNone(item['address'])
+        self.assertIsNotNone(item['location'])
+        self.assertIsNotNone(item['bedrooms'])
+        self.assertIsNotNone(item['date_available'])
+
+    def test_get_information_about_real_estate_2(self):
+        item = crawler.update_information_about_real_estate('https://www.realestate.com.au/property-apartment-qld-palm+beach-422896098')
+        print(item)
+        self.assertIsNotNone(item['location'])
+
 
     def test_get_time_to_and_from_work(self):
-        address = '21/14 Jefferson Lane Palm Beach'
+        address = '701/40 Surf Parade"Travel Inn" Broadbeach'
         td = crawler.get_time_to_work(address)
         print(td)
 
         td = crawler.get_time_from_work(address)
         print(td)
 
+    def test_tricky_address(self):
+        tricky_address = 'Broadbeach address available on request'
+        td = crawler.get_time_from_work(tricky_address)
+        print(td)
+
     def test_time_to_surfers(self):
-        address = '21/14 Jefferson Lane Palm Beach'
-        td = crawler.get_time_by_transit_to_surfers(address)
+        address = "'LIBERTY PANORAMA' 1 Lennie Avenue Main Beach"
+        td = crawler.get_time_to_surfers_with_transit(address)
         print(td)
 
     def test_get_next_monday(self):
@@ -65,6 +83,32 @@ class MyTestCase(unittest.TestCase):
         a = crawler.get_next_monday(time(16, 0, 0))
         print(a)
 
+    def test_get_price_per_week(self):
+        s = '$460 per week'
+        p = crawler.get_price_per_week(s)
+        self.assertEqual(p, 460)
+
+        s = '$470'
+        p = crawler.get_price_per_week(s)
+        self.assertEqual(p, 470)
+
+        s = '$650.00 per week'
+        p = crawler.get_price_per_week(s)
+        self.assertEqual(p, 650)
+
+        s = '420.00'
+        p = crawler.get_price_per_week(s)
+        self.assertEqual(p, 420)
+
+    def test_parse_date(self):
+        from dateutil import parser
+        dt = parser.parse("Aug 28 1999 12:00AM")
+        print(dt)
+
+        dt = parser.parse("Fri 09-Feb-18")
+        d = datetime.date(dt)
+        print(dt)
+        print(d)
 
 if __name__ == '__main__':
     unittest.main()

@@ -5,11 +5,12 @@ import googlemaps
 from realestate import shortcuts
 from datetime import datetime, timedelta, time
 import re
+from dateutil import parser
 
 def crawl(start_page):
     page_number = 1
 
-    for page_number in range(1, 3):
+    for page_number in range(1, 30):
         print('loop {}'.format(page_number))
 
         l = re.findall('(.*)(list-\d)(.*)', start_page)
@@ -59,10 +60,14 @@ def update_information_about_real_estate(link):
 
     driver.get(link)
     item['location'] = driver.find_element_by_css_selector("h3.address").text
-    item['price_per_week'] = driver.find_element_by_css_selector("p.priceText").text
+    item['price_per_week'] = get_price_per_week(driver.find_element_by_css_selector("p.priceText").text)
+    item['bedrooms'] = get_bedrooms(driver.find_element_by_css_selector(".featureList").text)
+    item['bathrooms'] = get_bathrooms(driver.find_element_by_css_selector(".featureList").text)
+    item['date_available'] = get_date_available(driver)
     item['time_to_work'] = get_time_to_work(item['location'])
     item['time_from_work'] = get_time_from_work(item['location'])
-    item['time_to_surfers'] = get_time_by_transit_to_surfers(item['location'])
+    item['time_to_surfers_with_transit'] = get_time_to_surfers_with_transit(item['location'])
+    item['time_to_surfers_by_car'] = get_time_to_surfers_by_car(item['location'])
 
     insert_or_update_real_estate_item(item)
 
@@ -81,6 +86,9 @@ def get_chrome_driver_without_loading_images():
 def get_time_between_a_and_b(from_address, to_address, arrival_time, mode='driving'):
     gmaps = googlemaps.Client(key='AIzaSyDeSZYfgu3ksBn9-3By5b_kqIPsnW6hR7k')
 
+    from_address = clean_adress_before_search(from_address)
+    to_address = clean_adress_before_search(to_address)
+
     try:
         directions_result = gmaps.directions(from_address,
                                              to_address,
@@ -93,13 +101,16 @@ def get_time_between_a_and_b(from_address, to_address, arrival_time, mode='drivi
         return None
     return ti
 
+def clean_adress_before_search(s):
+    s = s.replace("'", "").replace('"', '').replace(' address available on request', ', Gold Coast')
+    return s
+
 def get_next_monday(time_of_day):
 
     now = datetime.now()
     next_monday = datetime(now.year, now.month, now.day, time_of_day.hour, time_of_day.minute, time_of_day.second)
     while next_monday.weekday() != 0:  # 0 for monday
         next_monday += timedelta(days=1)
-    print(next_monday)
     return next_monday
 
 def get_time_to_work(address):
@@ -108,9 +119,13 @@ def get_time_to_work(address):
 def get_time_from_work(address):
     return get_time_between_a_and_b("76-84 Waterway Drive, Coomera, Australia", address, get_next_monday(time(16, 30, 0)))
 
-def get_time_by_transit_to_surfers(address):
+def get_time_to_surfers_with_transit(address):
     surfers = 'Paradise Centre, Cavill Avenue, Surfers Paradise Queensland'
     return get_time_between_a_and_b(address, surfers, get_next_monday(time(16, 30, 0)), mode='transit')
+
+def get_time_to_surfers_by_car(address):
+    surfers = 'Paradise Centre, Cavill Avenue, Surfers Paradise Queensland'
+    return get_time_between_a_and_b(address, surfers, get_next_monday(time(16, 30, 0)))
 
 def insert_or_update_real_estate_item(items):
     if isinstance(items, dict):
@@ -128,3 +143,43 @@ def insert_or_update_real_estate_item(items):
             setattr(estate, key, value)
 
         estate.save()
+
+
+def get_price_per_week(s):
+    try:
+        f = re.findall('([\d|\.]*)( )', s)
+        return int(f[0][0])
+    except:
+        try:
+            f = re.findall('(\d*)', s)
+            if '$' in s:
+                return int(f[1])
+            else:
+                return int(f[0])
+        except:
+            print('error finding week price in {}'.format(s))
+            return None
+
+
+def get_bedrooms(s):
+    try:
+        f = re.findall('(Bedrooms:)(\d)', s)
+        return int(f[0][1])
+    except:
+        return None
+
+def get_bathrooms(s):
+    try:
+        f = re.findall('(Bathrooms:)(\d)', s)
+        return int(f[0][1])
+    except:
+        return None
+
+def get_date_available(driver):
+    datestring = driver.find_element_by_css_selector(".available_date span").text
+    if 'Available Now' in datestring:
+        return 'Available Now'
+    else:
+        dt = parser.parse(datestring)
+        d = datetime.date(dt)
+        return d

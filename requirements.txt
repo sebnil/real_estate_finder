@@ -1,3 +1,6 @@
 selenium
 peewee
 googlemaps
+pandas
+openpyxl
+python-dateutil
