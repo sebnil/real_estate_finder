@@ -5,3 +5,4 @@ realestate.db
 *.pyc
 realestate.xlsx
 *.xlsx#
+output_xlsx

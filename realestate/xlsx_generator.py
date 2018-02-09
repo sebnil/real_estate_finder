@@ -1,7 +1,8 @@
 import pandas as pd
 import sqlite3
 from database import database_path
-
+from constants import output_xlsx_path
+from datetime import datetime
 
 def generate():
 
@@ -13,7 +14,9 @@ def generate():
 
     df['price_per_month_in_sek'] = pd.to_numeric((pd.to_numeric(df['price_per_week']).fillna(0) * 52 / 12) * 6.3862813, downcast='integer')
 
-    writer = pd.ExcelWriter('realestate.xlsx')
+    now = datetime.now()
+    now_timestring = now.__str__().replace(' ', '_')
+    writer = pd.ExcelWriter('{}/realestate_{}.xlsx'.format(output_xlsx_path, now_timestring))
     pd.DataFrame.to_excel(df, writer, index=False)
     writer.save()
 

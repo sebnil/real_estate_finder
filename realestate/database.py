@@ -1,8 +1,6 @@
 from peewee import *
-import os
+from constants import database_path
 
-script_location = os.path.dirname(os.path.abspath(__file__))
-database_path = script_location + '/realestate.db'
 db = SqliteDatabase(database_path)
 
 class RealEstate(Model):
