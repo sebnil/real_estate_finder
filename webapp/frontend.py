@@ -9,6 +9,8 @@ from flask import Blueprint, render_template, flash, redirect, url_for
 from flask_bootstrap import __version__ as FLASK_BOOTSTRAP_VERSION
 from markupsafe import escape
 import os
+import sys
+sys.path.append('.')
 from realestate.constants import output_xlsx_path
 
 frontend = Blueprint('frontend', __name__)

@@ -32,11 +32,10 @@ class MyTestCase(unittest.TestCase):
     def test_xlsx_generator_generate(self):
         xlsx_generator.generate()
 
+
     def test_total_crawl(self):
-        start_page = 'https://www.realestate.com.au/rent/property-unit+apartment-with-1-bedroom-between-400-500-in-gold+coast%2c+qld/list-1?maxBeds=1&source=location-search'
-        crawler.crawl(start_page)
-        crawler.update_all_real_estates_in_database()
-        xlsx_generator.generate()
+        crawler.total_crawl()
+
 
     def test_find_links_to_real_estates(self):
         links = crawler.find_links_to_real_estates('https://www.realestate.com.au/rent/in-gold+coast,+qld/list-1')
@@ -51,6 +50,10 @@ class MyTestCase(unittest.TestCase):
         self.assertIsNotNone(item['location'])
         self.assertIsNotNone(item['bedrooms'])
         self.assertIsNotNone(item['date_available'])
+
+
+    def test_delete_all_realestates(self):
+        crawler.delete_all_realestates()
 
     def test_get_information_about_real_estate_2(self):
         item = crawler.update_information_about_real_estate('https://www.realestate.com.au/property-apartment-qld-palm+beach-422896098')

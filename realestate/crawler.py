@@ -1,11 +1,12 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-from database import RealEstate
+from realestate.database import RealEstate
 import googlemaps
 from realestate import shortcuts
 from datetime import datetime, timedelta, time
 import re
 from dateutil import parser
+from realestate import xlsx_generator
 
 def crawl(start_page):
     page_number = 1
@@ -145,6 +146,10 @@ def insert_or_update_real_estate_item(items):
         estate.save()
 
 
+def delete_all_realestates():
+    RealEstate.delete().where(True).execute()
+
+
 def get_price_per_week(s):
     try:
         f = re.findall('([\d|\.]*)( )', s)
@@ -183,3 +188,11 @@ def get_date_available(driver):
         dt = parser.parse(datestring)
         d = datetime.date(dt)
         return d
+
+
+def total_crawl():
+    delete_all_realestates()
+    start_page = 'https://www.realestate.com.au/rent/property-unit+apartment-with-1-bedroom-between-400-500-in-gold+coast%2c+qld/list-1?maxBeds=1&source=location-search'
+    crawl(start_page)
+    update_all_real_estates_in_database()
+    xlsx_generator.generate()

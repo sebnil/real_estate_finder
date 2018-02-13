@@ -1,5 +1,5 @@
 from peewee import *
-from constants import database_path
+from realestate.constants import database_path
 
 db = SqliteDatabase(database_path)
 
