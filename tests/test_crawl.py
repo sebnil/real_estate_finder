@@ -45,11 +45,13 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(len(no_links_found), 0)
 
     def test_get_information_about_real_estate(self):
-        item = crawler.update_information_about_real_estate('https://www.realestate.com.au/property-unit-qld-palm+beach-422972482')
-        print(item)
-        self.assertIsNotNone(item['location'])
-        self.assertIsNotNone(item['bedrooms'])
-        self.assertIsNotNone(item['date_available'])
+        for i in range(1, 3):
+            item = crawler.update_information_about_real_estate('https://www.realestate.com.au/property-unit-qld-palm+beach-422972482')
+            print(item)
+            self.assertIsNotNone(item['location'])
+            self.assertIsNotNone(item['bedrooms'])
+            self.assertIsNotNone(item['date_available'])
+        crawler.close_driver()
 
 
     def test_delete_all_realestates(self):

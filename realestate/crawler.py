@@ -8,6 +8,10 @@ import re
 from dateutil import parser
 from realestate import xlsx_generator
 
+
+# global
+driver = None
+
 def crawl(start_page):
     page_number = 1
 
@@ -50,7 +54,6 @@ def find_links_to_real_estates(link):
             found_links.append({'link': link})
     except:
         print('no results found')
-    driver.close()
 
     return found_links
 
@@ -72,17 +75,21 @@ def update_information_about_real_estate(link):
 
     insert_or_update_real_estate_item(item)
 
-    driver.close()
-
     return item
 
 
 def get_chrome_driver_without_loading_images():
-    chromeOptions = webdriver.ChromeOptions()
-    prefs = {"profile.managed_default_content_settings.images": 2}
-    chromeOptions.add_experimental_option("prefs", prefs)
-    driver = webdriver.Chrome(chrome_options=chromeOptions)
+    global driver
+
+    if driver is None:
+        chromeOptions = webdriver.ChromeOptions()
+        prefs = {"profile.managed_default_content_settings.images": 2}
+        chromeOptions.add_experimental_option("prefs", prefs)
+        driver = webdriver.Chrome(chrome_options=chromeOptions)
     return driver
+
+def close_driver():
+    get_chrome_driver_without_loading_images().close()
 
 def get_time_between_a_and_b(from_address, to_address, arrival_time, mode='driving'):
     gmaps = googlemaps.Client(key='AIzaSyDeSZYfgu3ksBn9-3By5b_kqIPsnW6hR7k')
@@ -192,7 +199,14 @@ def get_date_available(driver):
 
 def total_crawl():
     delete_all_realestates()
-    start_page = 'https://www.realestate.com.au/rent/property-unit+apartment-with-1-bedroom-between-400-500-in-gold+coast%2c+qld/list-1?maxBeds=1&source=location-search'
+
+    # one bedrrom between 450 and 500
+    start_page = 'https://www.realestate.com.au/rent/property-unit+apartment-with-1-bedroom-between-450-550-in-gold+coast%2c+qld/list-1?maxBeds=1&includeSurrounding=false'
+
+    # two bedrooms between 450 and 500
+    #start_page = 'https://www.realestate.com.au/rent/property-unit+apartment-with-2-bedrooms-between-450-550-in-gold+coast,+qld/list-1?maxBeds=2&includeSurrounding=false'
+
     crawl(start_page)
     update_all_real_estates_in_database()
+    close_driver()
     xlsx_generator.generate()
