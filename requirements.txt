@@ -6,7 +6,3 @@ openpyxl
 python-dateutil
 flask
 flask-bootstrap
-celery
-celery[redis]
-redis
-celery-with-redis

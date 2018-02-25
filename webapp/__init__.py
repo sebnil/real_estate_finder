@@ -8,7 +8,6 @@
 
 from flask import Flask
 from flask_bootstrap import Bootstrap
-from background_worker import make_celery
 
 from frontend import frontend
 
@@ -31,11 +30,6 @@ def create_app():
     # the CDN support (this might become a default in later versions):
     app.config['BOOTSTRAP_SERVE_LOCAL'] = True
 
-    app.config.update(
-        CELERY_BROKER_URL='redis://localhost:6379',
-        CELERY_RESULT_BACKEND='redis://localhost:6379'
-    )
-    celery = make_celery(app)
 
     return app
 
