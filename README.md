@@ -23,5 +23,10 @@ Just use Anaconda. It is great.
 * **Sebastian Nilsson** - [sebastiannilsson.com](http://sebastiannilsson.com)
 
 ## License
-
 * All code is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+
+ 
+## Support my creation of open source software:
+[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=sebnil&url=https://github.com/sebnil/real_estate_finder)
+
+<a href='https://ko-fi.com/A0A2HYRH' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://az743702.vo.msecnd.net/cdn/kofi2.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
